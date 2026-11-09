@@ -1,0 +1,26 @@
+sections:
+  - key: cms_api
+    label: CMS REST API
+    elements:
+      - type: instructions
+        text: >-
+          In your CMS (SaaS) instance go to Settings > API Keys > Create API Key, and paste its
+          Client ID and Client Secret here. The key must have rights to publish content
+          (a read-only key cannot see drafts). Publishes are made as this API key, not as the editor.
+      - type: text
+        key: baseUrl
+        label: Base URL
+        hint: https://api.cms.optimizely.com
+        help: Leave blank for https://api.cms.optimizely.com. The token is requested from <base>/oauth/token.
+      - type: text
+        key: clientId
+        label: Client ID
+        help: Client ID of the CMS API key.
+      - type: secret
+        key: clientSecret
+        label: Client Secret
+        help: Client secret of the same API key. Leave blank to keep the saved secret.
+      - type: button
+        label: Save and test
+        action: save
+        style: primary

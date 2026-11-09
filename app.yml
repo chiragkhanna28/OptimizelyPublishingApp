@@ -1,0 +1,29 @@
+meta:
+  app_id: chirag_publishingapp
+  display_name: Publish Child Items
+  version: 1.0.0
+  # Must match your OCP vendor ID (from `ocp accounts whoami`).
+  vendor: horizontal_digital
+  summary: Publish the child items of a page in one click from the CMS sidebar.
+  support_url: https://www.horizontaldigital.com
+  contact_email: chirag.khanna28@gmail.com
+  categories:
+    - Productivity
+  availability:
+    - all
+
+runtime: node22-cms-ext
+
+functions:
+  # The key below is the ID the UI passes to context.extension.invokeFunction().
+  cms_extension:
+    entry_point: PublishChildrenBackend
+    description: Lists a page's child items and publishes their draft versions through the CMS REST API.
+    # Private function: callable only from this app's CMS UI extensions, no public URL.
+    accepts: cms_ui_extension
+
+ui_extensions:
+  sidebar:
+    - name: publish-children
+      entry_point: PublishChildren
+      display_name: Publish Child Items

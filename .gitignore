@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+
+.pnp.*
+.yarn/
+yarn.lock
+
+.git/
+.claude/
+
+.yalc/
+yalc.*
+.ocp-local/
+.preview/
