@@ -203,7 +203,8 @@ export function PublishChildren({context}: {context: ExtensionContext}) {
     for (let i = 0; i < queue.length; i += PUBLISH_BATCH_SIZE) {
       const batch = queue.slice(i, i + PUBLISH_BATCH_SIZE);
       try {
-        const res = await callBackend<PublishResult>(context, 'publish', {items: batch});
+        // parentKey lets the backend refuse anything that isn't a child of the open item.
+        const res = await callBackend<PublishResult>(context, 'publish', {parentKey: target.key, items: batch});
         results.push(...res.results);
       } catch (error) {
         results.push(...batch.map((b) => ({...b, ok: false, status: 0, message: errorText(error)})));

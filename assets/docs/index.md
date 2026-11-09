@@ -1,5 +1,12 @@
 # Publish Child Items
 
+## Important: publish permissions
+
+- Publishing uses the **app's CMS API key**, not the editor's account. The app can't see who the editor is, so it **does not check each editor's own CMS publish rights**. Any editor who can open the panel can publish its child items.
+- Install the app only where that is acceptable, or limit the API key's access rights in CMS **Settings > API Keys**.
+- Only **direct children of the open item** can be published. The backend verifies each item's parent before publishing.
+- The CMS version history shows the API key as the publisher.
+
 ## Setup
 
 1. In the CMS (SaaS), go to **Settings > API Keys > Create API Key**. Give the key rights to **publish** content.

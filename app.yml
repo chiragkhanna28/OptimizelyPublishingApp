@@ -1,5 +1,5 @@
 meta:
-  app_id: chirag_publishingapp
+  app_id: optimizelysaas_publish_children
   display_name: Publish Child Items
   version: 1.0.0
   # Must match your OCP vendor ID (from `ocp accounts whoami`).

@@ -1,5 +1,15 @@
 import {describe, expect, it} from 'vitest';
-import {childRecord, errorRecord, hasMorePages, listOf, summarizeVersions, totalOf} from './versions';
+import {
+  childRecord,
+  errorRecord,
+  hasMorePages,
+  isChildOf,
+  listOf,
+  normalizeKey,
+  parentOf,
+  summarizeVersions,
+  totalOf
+} from './versions';
 
 const KEY = 'a09341b4fa124e2aa2433cde31146ab1';
 
@@ -58,5 +68,30 @@ describe('childRecord / errorRecord', () => {
   it('marks failed lookups with a retry hint', () => {
     expect(errorRecord({key: KEY}, true).error).toBe('Rate limited by the CMS. Refresh to retry.');
     expect(errorRecord({key: KEY}, false).error).toBe('Could not load this item. Refresh to retry.');
+  });
+});
+
+describe('isChildOf (publish is limited to children of the open item)', () => {
+  const PARENT = '98eb33cfa7df48d1b987442c522984c8';
+
+  it('accepts a direct child, whatever the key format', () => {
+    expect(isChildOf({key: KEY, container: PARENT}, PARENT)).toBe(true);
+    expect(isChildOf({key: KEY, container: PARENT.toUpperCase()}, PARENT)).toBe(true);
+    expect(isChildOf({key: KEY, container: '98eb33cf-a7df-48d1-b987-442c522984c8'}, PARENT)).toBe(true);
+  });
+
+  it('rejects items under another parent', () => {
+    expect(isChildOf({key: KEY, container: '0874c4b2589548e08b3cd2daab63efbe'}, PARENT)).toBe(false);
+  });
+
+  it('rejects when the parent is unknown (safe default)', () => {
+    expect(isChildOf({key: KEY}, PARENT)).toBe(false);
+    expect(isChildOf(null, PARENT)).toBe(false);
+    expect(isChildOf({key: KEY, container: ''}, PARENT)).toBe(false);
+  });
+
+  it('reads the parent from `container`, and normalises keys', () => {
+    expect(parentOf({container: PARENT})).toBe(PARENT);
+    expect(normalizeKey('98EB33CF-A7DF')).toBe('98eb33cfa7df');
   });
 });

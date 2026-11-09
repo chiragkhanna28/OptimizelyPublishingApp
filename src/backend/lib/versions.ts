@@ -42,6 +42,24 @@ export function hasMorePages(body: unknown, pageIndex: number, returned: number,
   return total !== null ? (pageIndex + 1) * pageSize < total : returned === pageSize;
 }
 
+/** Content keys may come with or without dashes and in any case; compare them normalised. */
+export function normalizeKey(key: string | null | undefined): string {
+  return (key ?? '').replace(/-/g, '').toLowerCase();
+}
+
+/** The parent of a content node, from `GET /v1/content/{key}` (`container`). */
+export function parentOf(node: unknown): string | null {
+  if (!node || typeof node !== 'object') return null;
+  const n = node as Json;
+  return asString(n.container) ?? asString(n.parent) ?? asString(n.parentKey);
+}
+
+/** True only when `node`'s parent is `parentKey`. Unknown or missing parents are rejected. */
+export function isChildOf(node: unknown, parentKey: string): boolean {
+  const parent = normalizeKey(parentOf(node));
+  return parent !== '' && parent === normalizeKey(parentKey);
+}
+
 /** Compact, all-locale summary of a child's versions (drops anything without an ID or locale). */
 export function summarizeVersions(raw: Json[]): VersionSummary[] {
   const out: VersionSummary[] = [];

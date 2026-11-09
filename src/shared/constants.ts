@@ -1,7 +1,8 @@
 /** Key of the backend function under `functions:` in app.yml. */
 export const CMS_EXTENSION_FUNCTION_ID = 'cms_extension';
 
-export const DEFAULT_CMS_BASE_URL = 'https://api.cms.optimizely.com';
+/** The CMS (SaaS) REST API host. Fixed on purpose: the API secret is only ever sent here. */
+export const CMS_BASE_URL = 'https://api.cms.optimizely.com';
 
 /** Children loaded per "page" in the sidebar. Each child costs one CMS call, so keep this small
  * enough to stay well inside the ~59 s invokeFunction limit (cold start alone can take ~30 s). */

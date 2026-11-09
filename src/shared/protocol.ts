@@ -66,6 +66,8 @@ export interface PublishRequestItem {
 }
 
 export interface PublishParams {
+  /** Key of the item open in the editor. Only its direct children can be published. */
+  parentKey: string;
   items: PublishRequestItem[];
 }
 

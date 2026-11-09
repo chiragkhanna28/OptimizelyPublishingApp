@@ -1,5 +1,6 @@
 import {retryDelayMs, shouldRetry} from './retry';
 import {CmsSettings, loadCmsSettings} from './settings';
+import {tokenCacheKey} from './tokenKey';
 
 /** A problem the UI can explain to the editor (bad config, CMS refused the call...). */
 export class CmsError extends Error {
@@ -57,7 +58,7 @@ export async function requestToken(settings: CmsSettings): Promise<{token: strin
 }
 
 async function getToken(settings: CmsSettings): Promise<string> {
-  const cacheKey = `${settings.baseUrl}|${settings.clientId}|${settings.clientSecret.length}`;
+  const cacheKey = tokenCacheKey(settings.baseUrl, settings.clientId, settings.clientSecret);
   if (cached && cached.cacheKey === cacheKey && cached.expiresAt - 30_000 > Date.now()) {
     return cached.token;
   }

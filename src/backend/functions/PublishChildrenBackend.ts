@@ -75,6 +75,11 @@ export class PublishChildrenBackend extends App.Function {
   }
 
   private async publish(params: Record<string, unknown>): Promise<App.Response> {
+    // Publishing is limited to children of the item open in the editor (checked per item).
+    const parentKey = str(params.parentKey);
+    if (!CONTENT_KEY.test(parentKey)) {
+      return new App.Response(400, fail('bad_parent', 'Missing or invalid parent content key.'));
+    }
     const raw = Array.isArray(params.items) ? params.items : [];
     const items: PublishRequestItem[] = raw
       .map((item) => ({key: str((item as Record<string, unknown>)?.key), version: str((item as Record<string, unknown>)?.version)}))
@@ -85,7 +90,7 @@ export class PublishChildrenBackend extends App.Function {
       return new App.Response(400, fail('batch_too_large', `Send at most ${PUBLISH_BATCH_SIZE} items per call.`));
     }
 
-    const results = await publishVersions(items);
+    const results = await publishVersions(parentKey, items);
     logger.info('Published batch', results.map((r) => `${r.key}@${r.version}:${r.status}`).join(', '));
     return new App.Response(200, ok({results}));
   }

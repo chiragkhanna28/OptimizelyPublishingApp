@@ -2,7 +2,7 @@ import {CHILDREN_PAGE_SIZE} from '@shared/constants';
 import type {ChildRecord, ListChildrenResult, PublishItemResult, PublishRequestItem} from '@shared/protocol';
 import {logger} from '@zaiusinc/app-sdk';
 import {CmsError, cmsFetch, cmsGet, mapLimit} from './cmsApi';
-import {asString, childRecord, errorRecord, hasMorePages, Json, listOf} from './versions';
+import {asString, childRecord, errorRecord, hasMorePages, isChildOf, Json, listOf, normalizeKey} from './versions';
 
 /*
  * CMS (SaaS) REST API v1 endpoints used here:
@@ -40,11 +40,25 @@ export async function listChildren(key: string, pageIndex: number): Promise<List
   return {items, pageIndex, hasMore: hasMorePages(body, pageIndex, nodes.length, CHILDREN_PAGE_SIZE)};
 }
 
-export async function publishVersions(items: PublishRequestItem[]): Promise<PublishItemResult[]> {
+/**
+ * Publishes the given versions, but ONLY for direct children of `parentKey` (the item open in
+ * the editor). Each item's parent is read from the CMS before publishing; anything else is refused.
+ */
+export async function publishVersions(parentKey: string, items: PublishRequestItem[]): Promise<PublishItemResult[]> {
   // Sequential on purpose: small batches, gentle on the rate limit, easy per-item results.
   const results: PublishItemResult[] = [];
   for (const {key, version} of items) {
     try {
+      if (normalizeKey(key) === normalizeKey(parentKey)) {
+        results.push({key, version, ok: false, status: 403, message: 'Only child items of the open item can be published.'});
+        continue;
+      }
+      const node = await cmsFetch<Json>('GET', `/v1/content/${enc(key)}`);
+      if (node.status < 200 || node.status >= 300 || !isChildOf(node.body, parentKey)) {
+        logger.warn('Publish refused: not a child of the open item', key, parentKey, node.status);
+        results.push({key, version, ok: false, status: 403, message: 'Not a child item of the open item, so it was not published.'});
+        continue;
+      }
       const res = await cmsFetch<Json>('POST', `/v1/content/${enc(key)}/versions/${enc(version)}:publish`, {});
       const ok = res.status >= 200 && res.status < 300;
       const detail = res.body && (asString(res.body.detail) ?? asString(res.body.title) ?? asString(res.body.message));

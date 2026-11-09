@@ -26,6 +26,24 @@ you choose.
 
 Children are listed for the language you are editing, 10 at a time (**Load more** for the rest).
 
+## Important: publish permissions (please read before installing)
+
+Publishing is done with the **app's CMS API key**, not with the signed-in editor's account.
+CMS UI extensions don't receive the editor's identity, so the app **cannot check each editor's own CMS publish rights**.
+
+This means **any editor who can open the Publish Child Items panel can publish its child items**, even if their own CMS role doesn't allow publishing.
+
+To keep control:
+
+- Install the app only on CMS instances where everyone with access to the editor may publish, **or**
+- Give the API key access only to the parts of the site where bulk publishing is acceptable.
+
+Safeguards built into the app:
+
+- Only **direct children of the item open in the editor** can be published. The backend checks every item's parent before publishing and refuses anything else.
+- Editors confirm each publish in a dialog that lists the items.
+- The CMS version history shows the API key as the publisher.
+
 ## Installation and setup
 
 1. Install the app on your CMS (SaaS) instance from the App Directory.
@@ -36,7 +54,7 @@ Children are listed for the language you are editing, 10 at a time (**Load more*
 ## Data the app reads and changes
 
 - **Reads** the child items of the item you are editing and their versions, through the CMS REST API.
-- **Changes** only what you ask it to: it publishes the selected draft versions. Nothing is deleted.
+- **Changes** only what you ask it to: it publishes the selected draft versions of direct children of the open item. Nothing is deleted.
 - Publishes are made with the API key you configure, so the CMS history shows that API key as the publisher.
 - The API key is stored in the app's encrypted settings. No content is stored outside your CMS.
 

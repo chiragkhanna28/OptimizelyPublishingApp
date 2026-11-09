@@ -9,7 +9,8 @@ import {
   SubmittedFormData
 } from '@zaiusinc/app-sdk';
 import {CmsError, requestToken} from '../lib/cmsApi';
-import {CMS_SETTINGS_KEY, loadCmsSettings, normaliseBaseUrl, saveCmsSettings, str} from '../lib/settings';
+import {CMS_BASE_URL} from '@shared/constants';
+import {CMS_SETTINGS_KEY, loadCmsSettings, saveCmsSettings, str} from '../lib/settings';
 
 export class Lifecycle extends AppLifecycle {
   public async onInstall(): Promise<LifecycleResult> {
@@ -50,7 +51,7 @@ export class Lifecycle extends AppLifecycle {
 
     const saved = await loadCmsSettings();
     const settings = {
-      baseUrl: normaliseBaseUrl(str(formData.baseUrl)),
+      baseUrl: CMS_BASE_URL,
       clientId: str(formData.clientId),
       // A blank secret field keeps the stored secret.
       clientSecret: str(formData.clientSecret) || saved.clientSecret
